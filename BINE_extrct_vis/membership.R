@@ -32,10 +32,6 @@ for (i in 1:length(prefix_list)){
   lambda0_thresh=0.05 
   gs_thresh=5
   
-  #pmu_thresh=0.01
-  #lambda1_thresh=0.08
-  #lambda0_thresh=0.08 
-  #gs_thresh=5
   # number of samples extracted from the MCMC
   nsamples=20
   
@@ -119,14 +115,14 @@ for (i in 1:length(prefix_list)){
   raster_plot(s, paste(folder))
   dev.off()
   
-  beg_Fire = rowSums(omega [,1:100]>0.999) - rowSums(omega_extended [,(ncol(omega_extended)-5000):ncol(omega_extended)]>0.999)
+  beg_Fire = beg_fire(omega_extended, bin_size = 50) > 0.5
   
   write.table(beg_Fire, file = paste(folder, '/begin_firing.dat', sep = ""))
-  write.table(omega [beg_Fire < 50,], paste(folder, '/omega_be.dat', sep = ""))
-  write.table(omega_extended [beg_Fire < 50,], paste(folder, '/omega_ext_be.dat', sep = ""))
-  write.table(ensel [beg_Fire < 50], paste(folder, '/ensel_be.dat', sep = ""))
-  write.table(ensel [beg_Fire > 50], paste(folder, '/ensel_excluded.dat', sep = ""))
-  write.table(omega [beg_Fire > 50,], paste(folder, '/omega_excluded.dat', sep = ""))
+  write.table(omega [beg_Fire,], paste(folder, '/omega_be.dat', sep = ""))
+  write.table(omega_extended [beg_Fire,], paste(folder, '/omega_ext_be.dat', sep = ""))
+  write.table(ensel [beg_Fire], paste(folder, '/ensel_be.dat', sep = ""))
+  write.table(ensel [beg_Fire ], paste(folder, '/ensel_excluded.dat', sep = ""))
+  write.table(omega [beg_Fire,], paste(folder, '/omega_excluded.dat', sep = ""))
   
   
   write.table(omega, file = paste(folder, "/omega.dat", sep =""))

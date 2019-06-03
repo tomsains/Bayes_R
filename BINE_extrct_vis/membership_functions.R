@@ -1,8 +1,12 @@
 # These are the functions to calculate assembly paramemters
 library(splancs)
-library(splancs)
+library(igraph)
+library(viridis)
+library(DescTools)
+library(manipulate)
+library(fields)
 
-# calculation of tectal size
+# functions to calculate the size of the tectum
 
 cha<-function(x,y){
   chull(x,y)->i
@@ -22,16 +26,15 @@ total_area <- function(minprob = 0.99){
 }
 
 
-#finding and ploting midline of tectum and finding the anterior or posterior
-find_midline <- function(){
+#finding and ploting midline of tectum and finding the anterior or posterior in order to calculate assembly spatial parameters
+find_midline <- function(centers){
   plot_points <- function(data, a, b){
     smoothScatter(data[,1],data[,2], transformation = function(x) x^.25)
     points(data[,1],data[,2], cex= 0.2)
     abline(a = a, b = b, col ="red", lwd =5)
   }
-  manipulate(plot_points(all_centers [,1:2], a, b), a =slider(-100,300), b = slider(-3,-0.5))
+  manipulate(plot_points(centers [,1:2], a, b), a =slider(-100,300), b = slider(-3,-0.5))
 }
-
 
 plot_midline <- function() {
   smoothScatter(centers[,1],centers[,2], transformation = function(x) x^.25)
@@ -44,8 +47,8 @@ Lateral_index <- function(){
   counter = 1
   for (i in as.numeric(ensel)){
     assembly_mem <- centers[mem==i & probs>.99, 1:2]
-    LH = sum(assembly_mem [,2] > (midline$slope [1]*assembly_mem [,1] +midline$intercept [1]))
-    RH <- sum(assembly_mem [,2] < (midline$slope [1]*assembly_mem [,1] +midline$intercept [1]))
+    LH = sum(assembly_mem [,2] > (midline$slope [prefix_ID] *assembly_mem [,1] +midline$intercept [prefix_ID]))
+    RH <- sum(assembly_mem [,2] < (midline$slope [prefix_ID]*assembly_mem [,1] +midline$intercept [prefix_ID]))
     ALL <- nrow(assembly_mem)
     LI [counter] <- ((LH-RH)/ALL)
     counter = counter +1
@@ -54,13 +57,17 @@ Lateral_index <- function(){
   return(LI)
 }
 
-rotate_tect_by_line <- function(centers = all_centers) {
-  angle <- atan(-1) +pi
+rotate_tect_by_line <- function(centers = centers) {
+  angle <- atan(midline$slope [prefix_ID]) +pi
   rot_angle <- angle - (pi/2)
   trans_mat <- matrix(c(cos(rot_angle), sin(rot_angle), -sin(rot_angle), cos(rot_angle)), 2, 2)
   rot_cent <- as.matrix(centers [,1:2]) %*% trans_mat
-  shift_cent <- 10* cos(angle)
-  rot_cent [,1] <- rot_cent [,1] - shift_cent
+  a = seq(1,100,1)
+  b = midline$slope[1]*seq(1,100,1)+midline$intercept[1]
+  new_inter =  cbind(a, b) %*% trans_mat
+  #shift_cent <- mid$intercept [prefix_ID]* cos(rot_angle)
+  #print(shift_cent)
+  rot_cent [,1] <- rot_cent [,1] - new_inter [1,1]
   return(rot_cent)
 }
 
@@ -77,6 +84,7 @@ mean_by_bin <- function(centers) {
     cuts <- cut(x = rotRL [[i]] [,1], breaks = 10)
     means [[i]] <- cbind(by(data = rotRL [[i]] [,1], INDICES = cuts, FUN =function(x) {mean(x)}), by(data = rotRL [[i]] [,2], INDICES = cuts, FUN =function(x) {mean(x)}))
     line [[i]] <- cbind(Rotate(approx(means [[i]], n = 100), theta = theta [-i])$x,Rotate(approx(means [[i]], n = 100), theta = theta [-i])$y)
+    
   }
   return(list(new_cent, line, RL))
 } 
@@ -131,9 +139,32 @@ within_cluster_corr <- function(){
   return(ensemble_mean)
 }
 
+sort_by_correlation <-function(omega) {
+  d <- dist(omega)
+  
+  ensel_sort <- ensel [hclust(d)$order]
+  cell_list <- list(length(ensel_sort))
+  for (i in 1:length(ensel_sort)) {
+    cells <- s[selection+1, ] [mem == ensel_sort [i] &  probs > 0.99,]
+    dis <- dist(cells)
+    cells <- cells [hclust(dis)$order, ]
+    cell_list [[i]] <- cells
+  }
+  raster_plot(do.call("rbind", cell_list))
+}
 
+# funciton to identify ensembles that are fireing at the begining
 
-
+beg_fire <- function(omega_ext, bin_size){
+  beg_rate <- rowSums(omega_ext [,1:bin_size]>0.2)
+  av_rate <- vector(length = nrow(omega_ext))
+  for (i in 1:nrow(omega_ext)) {
+    trace = omega_ext [i,] [10061:ncol(omega_ext)] > 0.2
+    reshaped_end = matrix(trace, ncol = bin_size)
+    av_rate [i] <- max(rowSums(reshaped_end))
+  }
+  return((beg_rate-av_rate)/50)
+}
 
 ########################################################################################################################
 
@@ -633,3 +664,7 @@ get_cormat_bayes<- function(nav=10,PMAX=200,th,disp=FALSE){
   
   return(list(cortab=cortab,corsel=corsel/nav,ad=ad,graph=graph))
 }
+
+
+##########################################################################################
+
