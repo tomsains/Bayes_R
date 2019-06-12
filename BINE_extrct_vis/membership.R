@@ -38,7 +38,7 @@ for (i in 1:length(prefix_list)){
   # load input binary matrix S
   loadS=T
   if(loadS) s<-read.table(paste(data_location, prefix, spikes_suffix ,sep=""));
- # if(loadS) c<- read.table(paste(data_location, prefix, cal_suffix ,sep=""));
+  # c<- read.table(paste(data_location, prefix, cal_suffix ,sep=""));
   # load results
   mem_traj<-read.table(paste(folder,"/membership_traj.dat",sep=""))
   centers<-read.table(paste(data_location ,prefix,centers_suffix,sep=""));
@@ -115,20 +115,31 @@ for (i in 1:length(prefix_list)){
   raster_plot(s, paste(folder))
   dev.off()
   
-  beg_Fire = beg_fire(omega_extended, bin_size = 50) > 0.5
+  new_co <- vector("numeric", length = length(ensel))
+  for (i in 1:length(ensel)) {new_co [i] <- unlist(new_coherence(i, 0.2))}
   
-  write.table(beg_Fire, file = paste(folder, '/begin_firing.dat', sep = ""))
-  write.table(omega [beg_Fire,], paste(folder, '/omega_be.dat', sep = ""))
-  write.table(omega_extended [beg_Fire,], paste(folder, '/omega_ext_be.dat', sep = ""))
-  write.table(ensel [beg_Fire], paste(folder, '/ensel_be.dat', sep = ""))
-  write.table(ensel [beg_Fire ], paste(folder, '/ensel_excluded.dat', sep = ""))
-  write.table(omega [beg_Fire,], paste(folder, '/omega_excluded.dat', sep = ""))
+  
+  beg_Fire = beg_fire(omega_extended, bin_size = 50) 
+  beg_firing = data.frame(Beg_index = beg_Fire, Beg_thresh = beg_Fire > 0.3)
+  
+  write.table(beg_firing, file = paste(folder, '/begin_firing.dat', sep = ""))
+  write.table(omega [!beg_firing$Beg_thresh,], paste(folder, '/omega_be.dat', sep = ""))
+  write.table(omega_extended [!beg_firing$Beg_thresh,], paste(folder, '/omega_ext_be.dat', sep = ""))
+  write.table(ensel [!beg_firing$Beg_thresh], paste(folder, '/ensel_be.dat', sep = ""))
+  write.table(ensel [beg_firing$Beg_thresh ], paste(folder, '/ensel_excluded.dat', sep = ""))
+  write.table(omega [beg_firing$Beg_thresh,], paste(folder, '/omega_excluded.dat', sep = ""))
+  
+  write.table(cbind(reverberating_activity(omega_extended = omega_extended), new_co), paste(folder, '/assembly_duration_and_co.dat', sep = ""))
+
+  
+  
+  png(paste(folder, "/exlusion_plot.png", sep =""), width = 1500, height = 1000)
+  check_exclusions(paste(folder))
+  dev.off()
   
   
   write.table(omega, file = paste(folder, "/omega.dat", sep =""))
   write.table(omega_extended, file = paste(folder, "/omega_extended.dat", sep =""))
-  
- 
   write.table(eigen_decomp_of_cov(), file = paste(folder, "/eigen_decomp_of_cov.dat", sep ="") )
   write.table(total_area(), file = paste(folder, "/ensem_area.dat", sep =""))
   write.table(within_cluster_corr(), file = paste(folder, "/wcc.dat", sep ="")) 

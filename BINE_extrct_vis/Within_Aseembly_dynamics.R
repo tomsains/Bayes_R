@@ -17,7 +17,7 @@ raster_plot2 <- function(stmp1, m = "WT_GRAV",axes =F, xlim = xlim) {
   stmp1_vec = as.numeric(unlist(stmp1))
   u1=rep(1:ncol(stmp1),1,each=nrow(stmp1))
   v1=rep(1:nrow(stmp1),ncol(stmp1))
-plot(u1[stmp1_vec>0],v1[stmp1_vec>0],pch=19,cex=0.001,col="black",cex.main=3, xlim = xlim, xaxt='n',  xaxs = "i", yaxs ="i", ylim = c(0,nrow(stmp1)), ylab =  "Cell ID", cex.axis = 2, cex.lab = 3)
+  plot(u1[stmp1_vec>0],v1[stmp1_vec>0],pch=19,cex=0.001,col="black",cex.main=3, xlim = xlim, xaxt='n',  xaxs = "i", yaxs ="i", ylim = c(0,nrow(stmp1)), ylab =  "Cell ID", cex.axis = 2, cex.lab = 3)
   title(main = list( m, cex = 2.5), adj = 0.5, line = 2)
 }
 
@@ -27,9 +27,6 @@ plot_raster_sorted <- function(s, fr = c(1,ncol(s))) {
   ff <- time_to_fire(c)
   raster_plot(s [order(ff),])
 }
-
-
-
 
 sort_by_correlation <-function(omega) {
   d <- dist(omega)
@@ -47,11 +44,11 @@ sort_by_correlation <-function(omega) {
 
 plot_assembly_w_omega <- function(ensel_num, xlim = c(1,17460)){
   cells <- s[selection+1, ] [mem == ensel [ensel_num] &  probs > 0.99,]
-  dis <- dist(cells)
-  cells <- cells [hclust(dis)$order, ]
+  cor_with_cluster <- cor(omega_extended [which(ensel == ensel [ensel_num]),] > 0.8, t(cells))
+  cells <- cells [order(cor_with_cluster,decreasing = TRUE), ]
   layout(matrix(c(1,1,1,1,1,1,2,2), nrow = 4, ncol = 2, byrow = TRUE))
   par( mar = c(0,6,6,2))
-  raster_plot(cells, xlim = xlim)
+  raster_plot2(cells, xlim = xlim)
   par( mar = c(2,6,0,2))
   plot(omega_extended [which(ensel == ensel [ensel_num]),], type ='h', xlim = xlim, xaxs = "i", yaxs ="i",  cex.axis =2, ylab = "prob Aseembly Active")
 }
@@ -84,6 +81,64 @@ plot_assembly_w_omega_ttf_cal <- function(ensel_num, time_of_intrest =c(10, 30),
 }
 
 
-#png("../../Lab_meeting_plots/Assembly_w_Activity.png", width = 1000, height = 300)
-#plot_assembly_w_omega_ttf(10, time_of_intrest = 2500:5000)
-#dev.off()
+new_coherence <- function(omega_extended) {
+  omega_extended_smooth <- t(apply(omega_extended, 1, rollmean, k= 5, fill = c(0), align ="center"))
+  start
+}
+
+
+
+reverberating_activity <- function(omega_extended) {
+  response_duration <- function(t) {
+    runs <- rle(t)
+    return(runs$lengths[runs$values==1])
+  }
+  omega_extended <- t(apply(omega_extended, 1, rollmean, k= 5, fill = c(0), align ="center")) 
+  durations <- apply(X = omega_extended > 0.2, 1, response_duration)
+  thresh_durations <- lapply(durations, function(x) {x [x > 3]})
+  mean_Ass_duration <- lapply(thresh_durations, mean )
+  max_Ass_duration <- lapply(thresh_durations, max)
+  bursting_events <- lapply(thresh_durations, length)
+  return(data.frame(mean_Ass_duration = unlist(mean_Ass_duration), max_Ass_dur =unlist(max_Ass_duration), bursting_events = unlist(bursting_events)))
+}
+
+
+
+new_coherence <- function(ensel_num, thresh =0.2) {
+  cells <- s[selection+1, ] [mem == ensel [ensel_num] &  probs > 0.99,]
+  omega_extended_smooth <- rollmean(omega_extended [which(ensel == ensel [ensel_num]),] > 0.8, k= 5, fill = c(0), align ="center")
+ 
+  w_start <- which(diff(omega_extended_smooth > thresh)  == 1)
+  w_end <- which(diff(omega_extended_smooth > thresh) == -1)
+  awa <- matrix(NA,nrow = nrow(cells), ncol = length(w_start))
+  if (length(w_start) == 0) {
+    return(0)
+  }
+    else{
+    for (i in 1:length(w_start)) {awa [,i] <- rowSums(cells [,w_start[i]:w_end[i]])}
+    return(mean(colSums(awa >0)/nrow(awa)))
+  }
+}
+
+
+
+plot_assembly_w_omega_and_map <- function(ensel_num, xlim = c(1,17460)){
+  cells <- s[selection+1, ] [mem == ensel [ensel_num] &  probs > 0.99,]
+  cent <- centers [mem == ensel [ensel_num] &  probs > 0.99,]
+  cor_with_cluster <- cor(omega_extended [which(ensel == ensel [ensel_num]),] > 0.8, t(cells))
+  cells <- cells [order(cor_with_cluster,decreasing = TRUE), ]
+  layout(matrix(c(1,2,2,1,2,2,0,3,3), nrow = 3, ncol = 3, byrow = TRUE))
+  par(mar = c(2,2,2,2))
+  plot(centers [,1:2], pch = 19 , cex = 0.2)
+  points(cent [,1:2], col ='red', pch = 19)
+  par( mar = c(0,2,2,2))
+  raster_plot2(cells, xlim = xlim)
+  par( mar = c(2,2,0,2))
+  plot(omega_extended [which(ensel == ensel [ensel_num]),], type ='h', xlim = xlim, xaxs = "i", yaxs ="i",  cex.axis =2, ylab = "prob Aseembly Active")
+}
+
+for (i in 1:length(ensel)) {
+  png(paste(folder, "/Assembly_", ensel [i], ".png", sep = ''), width = 1000, height = 300)
+  plot_assembly_w_omega_and_map(i)
+  dev.off()
+}

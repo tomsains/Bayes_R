@@ -80,6 +80,9 @@ for(pref in prefix_list){
   dflist[[counter]]$tectum_total_area <- unlist(read.table(file = paste(folder, "/eigen_decomp_of_cov.dat", sep =""))$X)
   dflist[[counter]]$norm_eigen_decomp <- unlist(read.table(file = paste(folder, "/eigen_decomp_of_cov.dat", sep =""))$norm_eigen_decomp)
   
+  dflist[[counter]] <- cbind(dflist [[counter]], read.table(paste(folder, '/begin_firing.dat', sep = "")))
+  dflist[[counter]] <- cbind(dflist [[counter]], read.table(paste(folder, '/assembly_duration_and_co.dat', sep = "")))
+  
   sample_size[counter,] = as.numeric(read.table(paste(folder,"/dims.dat",sep="")))[1:2]
   orig_labels[[counter]]=as.numeric(gsub("V","",names(A$gs.mean)[seltab[[counter]]]))
   cat(orig_labels[[counter]],"\n")
@@ -216,7 +219,7 @@ plot_corrdist <- function(print=FALSE){
 df$norm_eigen <- df$norm_eigen_decomp/df$tectum_total_area
 
 
-dat <- apply(df,2, function(x) by(x,df$ID,mean))
+dat <- apply(df,2, function(x) by(x,df$ID,mean, na.rm =TRUE))
 
 
 
@@ -263,4 +266,17 @@ calculate_difference_mat <- function(x = "gs",  y = "lambda1", cond_a, cond_b) {
   image(grav, col = r, xlab = x, ylab = y,breaks=seq(0,max(grav$z),l=33))
   title("grav")
   return(diff)
+}
+
+
+
+
+threshold_tests <- function(new, threshold){
+  new <- new [threshold,]
+  a <- aggregate(x = new, by = list(new$ID, new$Rearing_conditions), FUN = mean)
+  print(paste("total assembly number:", str(nrow(new))))
+ 
+  ggplot(a, aes(group.2, gs)) + geom_boxplot() + geom_jitter()
+  #return(t.test(a$gs ~ a$Group.2))
+ 
 }

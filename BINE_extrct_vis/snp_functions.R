@@ -49,6 +49,10 @@ seg1d <- function(trace,threshold=0){
 
 
 
+
+  
+
+
 response_amplitude <- function(trace) {
   seg_trace <- seg1d(trace , threshold = 0.1)
   amp <- by(trace, seg_trace, max)

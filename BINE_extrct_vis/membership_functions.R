@@ -667,4 +667,13 @@ get_cormat_bayes<- function(nav=10,PMAX=200,th,disp=FALSE){
 
 
 ##########################################################################################
-
+check_exclusions <- function(folder_names) {
+  omega <- as.matrix(read.table(file = paste(folder_names, "/omega_be.dat", sep ='')))
+  omega_ex <- as.matrix(read.table(file = paste(folder_names, "/omega_excluded.dat", sep ='')))
+  layout(matrix(c(1,1,1,1,1,1,2,2), nrow = 4, ncol = 2, byrow = TRUE))
+  par(mar = c(0,6,5,2))
+  image(t(omega))
+  par(mar = c(6,6,0,2))
+  
+  image(t(omega_ex))
+}
