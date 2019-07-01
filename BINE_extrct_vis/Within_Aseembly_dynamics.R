@@ -94,11 +94,13 @@ reverberating_activity <- function(omega_extended) {
     return(runs$lengths[runs$values==1])
   }
   omega_extended <- t(apply(omega_extended, 1, rollmean, k= 5, fill = c(0), align ="center")) 
-  durations <- apply(X = omega_extended > 0.2, 1, response_duration)
+  durations <- apply(X = omega_extended, 1, response_duration)
   thresh_durations <- lapply(durations, function(x) {x [x > 3]})
-  mean_Ass_duration <- lapply(thresh_durations, mean )
-  max_Ass_duration <- lapply(thresh_durations, max)
+  mean_Ass_duration <- lapply(thresh_durations, mean, na.rm =T)
+  max_Ass_duration <- lapply(thresh_durations, max, na.rm = T)
   bursting_events <- lapply(thresh_durations, length)
+  mean_Ass_duration [is.nan(unlist(mean_Ass_duration))] <- 0
+  max_Ass_duration [max_Ass_duration == -Inf] <- 0
   return(data.frame(mean_Ass_duration = unlist(mean_Ass_duration), max_Ass_dur =unlist(max_Ass_duration), bursting_events = unlist(bursting_events)))
 }
 

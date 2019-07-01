@@ -10,7 +10,7 @@ LI_filter = FALSE
 
 #########################################################################################################################################################
 
-
+setwd("/media/thomas_sainsbury/Samsung_T5/Bayesian_network_inference/BPTS_Tom")
 
 data_location = "../data_for_Gibbs/7_dpf/"
 centers_suffix = "_sa_aligned_all_cells_centers_cut_ordered.dat"
