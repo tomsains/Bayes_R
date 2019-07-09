@@ -27,10 +27,10 @@ corr_data = paste(genotype,"_", age,"_", Rearing_conditions, sep = "")
 
 
 #snp(folder = data_location, save_name = corr_data)
-source("Generalised_membership_v4.R")
-source("Generalise_make_figures.R")
+#source("Generalised_membership_v4.R")
+#source("Generalise_make_figures.R")
 #Check_midlines(midline = midline, folder = data_location)
-
+source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 
 
 # 5_dpf 
@@ -53,12 +53,12 @@ genotype = "WT"
 age = "5_dpf"
 Rearing_conditions = "NORM"
 corr_data = paste(genotype,"_", age,"_", Rearing_conditions, sep = "")
-Check_midlines(midline = midline, folder = data_location)
+#Check_midlines(midline = midline, folder = data_location)
 
 #snp(folder = data_location, save_name = corr_data)
-source("Generalised_membership_v4.R")
-source("Generalise_make_figures.R")
-
+#source("Generalised_membership_v4.R")
+#source("Generalise_make_figures.R")
+source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 
 
 
@@ -88,10 +88,9 @@ Check_midlines(midline = midline, folder = data_location)
 #snp(folder = data_location, save_name = corr_data)
 
 
-source("Generalised_membership_v4.R")
-
-source("Generalise_make_figures.R")
-
+#source("Generalised_membership_v4.R")
+#source("Generalise_make_figures.R")
+source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 
 
 
@@ -122,10 +121,10 @@ corr_data = paste(genotype,"_", age,"_", Rearing_conditions, sep = "")
 #Check_midlines(midline = midline, folder = data_location)
 #snp(folder = data_location, save_name = corr_data)
 
-source("Generalised_membership_v4.R")
-source("Generalise_make_figures.R")
+#source("Generalised_membership_v4.R")
+#source("Generalise_make_figures.R")
 
-
+source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 
 
 #WT_5_dpf
@@ -147,9 +146,9 @@ Check_midlines(midline = midline, folder = data_location)
 
 #snp(folder = data_location, save_name = corr_data)
 
-source("Generalised_membership_v4.R")
-source("Generalise_make_figures.R")
-
+#source("Generalised_membership_v4.R")
+#source("Generalise_make_figures.R")
+source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 
 #WT_3_dpf
 ########################################################################################################################################################
@@ -171,9 +170,9 @@ Check_midlines(midline = midline, folder = data_location)
 
 #snp(folder = data_location, save_name = corr_data)
 
-source("Generalised_membership_v4.R")
-source("Generalise_make_figures.R")
-
+#source("Generalised_membership_v4.R")
+#source("Generalise_make_figures.R")
+source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 
 
 
@@ -211,9 +210,9 @@ Check_midlines(midline = midline, folder = data_location)
 
 #snp(folder = data_location, save_name = corr_data)
 
-source("Generalised_membership_v4.R")
-source("Generalise_make_figures.R")
-
+#source("Generalised_membership_v4.R")
+#source("Generalise_make_figures.R")
+source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 
 
 #Grin 7_dpf_NORM
@@ -238,7 +237,7 @@ Check_midlines(midline = midline, folder = data_location)
 
 #snp(folder = data_location, save_name = corr_data)
 
-source("Generalised_membership_v4.R")
-source("Generalise_make_figures.R")
-
+#source("Generalised_membership_v4.R")
+#source("Generalise_make_figures.R")
+source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 

@@ -6,7 +6,7 @@ time_to_fire <- function(c) {
 
 
 
-raster_plot2 <- function(stmp1, m = "WT_GRAV",axes =F, xlim = xlim) {
+raster_plot2 <- function(stmp1, m = "WT_GRAV",axes =F, xlim = c(0,17460)) {
   # stmp1 is the binary activity matrix
   circular_permutation <- function(t) {
     permute_by <- round(runif(1,1, length(t)))

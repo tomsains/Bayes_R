@@ -11,6 +11,7 @@ Mode <- function(x) {
   ux[which.max(tabulate(match(x, ux)))]
 }
 
+
 guassian_smooth <- function(x){
   if (sum(x) == 0) {
      sm_tr <- rep(0, length(x))
@@ -101,7 +102,12 @@ beg_fire_ten <- function(omega, bin_size=50){
 
 response_duration <- function(t) {
   runs <- rle(t)
-  return(runs$lengths[runs$values==1])
+  if (length(runs$values) == 1) {
+    return(0)
+  }
+  else{
+    return(runs$lengths[runs$values==1])
+  }
 }
 
 number_bursting_Events <- function(omega) {
@@ -126,6 +132,7 @@ Assembly_size <- function(x) {
   return(size)
 }
 
+
 Assembley_Compactness <- function(x) {
   Compactness <- vector("numeric", length = cluster_num_per_sample)
   for (i in 1:cluster_num_per_sample){
@@ -141,22 +148,67 @@ Assembley_Compactness <- function(x) {
 }
 
 
-new_coherence <- function(x, omega_ext_smooth, thresh = 0.01) {
-  coherence <- vector("numeric", length = cluster_num_per_sample)
-  for (i in 1:cluster_num_per_sample){
-    assembly_mem <- centers [as.vector(as.numeric(x$mem) == i),]
-    w_start <- which(diff(omega_ext_smooth > thresh)  == 1)
-    w_end <- which(diff(omega_extended_smooth > thresh) == -1)
+Coherence <- function(cells, omega_trace) {
+    w_start <- which(diff(omega_trace)  == 1)
+    w_end <- which(diff(omega_trace) == -1)
+    if (length(w_start) > length(w_end)) {
+      w_end <- c(w_end, length(omega_trace))
+    }
+    else if (length(w_start) < length(w_end)) {
+      w_start<- c(1, w_start)
+    }
     awa <- matrix(NA,nrow = nrow(cells), ncol = length(w_start))
+   
     if (length(w_start) == 0) {
       return(0)
     }
-  else{
-    for (i in 1:length(w_start)) {awa [,i] <- rowSums(cells [,w_start[i]:w_end[i]])}
-    return(mean(colSums(awa >0)/nrow(awa)))
-  }
+    else{
+      for (i in 1:length(w_start)) {awa [,i] <- rowSums(cells [,w_start[i]:w_end[i]])}
+      return(mean(colSums(awa >0)/nrow(awa)))
+    }
 }
 
+
+new_coherence <- function(x) {
+  coherence <- vector("numeric", length = cluster_num_per_sample)
+  print("done")
+  for (i in 1:cluster_num_per_sample) {
+    print(i)
+    cells <- s [selection + 1,] [x$mem == i,]
+    if (is.vector(cells)) {
+      coherence [i] <- 0
+    }
+    else {
+      o <- x$omega [i,]
+      coherence [i] <- Coherence(cells, o)
+    }
+  }
+  return(coherence)
+}
+
+
+
+within_cl_corr <- function(x) {
+  mean_corr <- vector("numeric", nrow(x$omega))
+  spikes <- s [selection+1,]
+  pb <- txtProgressBar(min = 1, max = nrow(x$omega), style = 3)
+  for (i in 1:nrow(x$omega)) {
+    spk <- spikes[x$mem == i,]
+    if (is.vector(spk)) {
+      mean_corr[i] = 0
+    }
+    else {
+      if (nrow(spk) > 100) {
+        spk <- spk [sample(nrow(spk), 99),]
+      }
+      cor_mat <- cor(t(spk))
+      lower <- cor_mat[lower.tri(cor_mat)]
+      mean_corr [i] <- mean(abs(lower))
+      setTxtProgressBar(pb, i)
+    }
+  }
+  return(mean_corr)
+}
 
 #####################################################################################################################################
 # Plots
