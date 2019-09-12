@@ -342,11 +342,9 @@ dev.off()
 plot_2dkde <- function(data_frame, x= "gs", y = "lambda1", xlab = "Size (# neurons)", ylab = "Coherence", ylim = c(0,300)) {
   par(mar =c(5,6,2,2))
   heatmap <- kde2d(unlist(data_frame[x]), unlist(data_frame [y]), n= 100)
-  library(RColorBrewer)
-  rf <- colorRampPalette(rev(brewer.pal(11,'Spectral')))
-  r <- rf(32)
+  
   heatmap$z <- heatmap$z/sum(heatmap$z)
-  image(heatmap, col = r, xlab = xlab, ylab = ylab, cex.lab =3, cex.axis = 2, ylim = ylim)
+  plot.image(heatmap)
 }
 
 

@@ -6,26 +6,10 @@ time_to_fire <- function(c) {
 
 
 
-raster_plot2 <- function(stmp1, m = "WT_GRAV",axes =F, xlim = c(0,17460)) {
-  # stmp1 is the binary activity matrix
-  circular_permutation <- function(t) {
-    permute_by <- round(runif(1,1, length(t)))
-    pt <- c(tail(t, -permute_by), head(t, permute_by))
-    return(pt)
-  }
-  stmp1<- as.matrix(stmp1)
-  stmp1_vec = as.numeric(unlist(stmp1))
-  u1=rep(1:ncol(stmp1),1,each=nrow(stmp1))
-  v1=rep(1:nrow(stmp1),ncol(stmp1))
-  plot(u1[stmp1_vec>0],v1[stmp1_vec>0],pch=19,cex=0.001,col="black",cex.main=3, xlim = xlim, xaxt='n',  xaxs = "i", yaxs ="i", ylim = c(0,nrow(stmp1)), ylab =  "Cell ID", cex.axis = 2, cex.lab = 3)
-  title(main = list( m, cex = 2.5), adj = 0.5, line = 2)
-}
-
-
 plot_raster_sorted <- function(s, fr = c(1,ncol(s))) {
   c <- s [,fr [1]:fr[2]]
   ff <- time_to_fire(c)
-  raster_plot(s [order(ff),])
+  raster_plot2(s [order(ff),])
 }
 
 sort_by_correlation <-function(omega) {
@@ -39,7 +23,7 @@ sort_by_correlation <-function(omega) {
     cells <- cells [hclust(dis)$order, ]
     cell_list [[i]] <- cells
   }
-  raster_plot(do.call("rbind", cell_list))
+  raster_plot2(do.call("rbind", cell_list))
 }
 
 plot_assembly_w_omega <- function(ensel_num, xlim = c(1,17460)){

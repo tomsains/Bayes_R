@@ -1,8 +1,5 @@
-#genotype = "WT"
-#age = "7_dpf"
-#Rearing_conditions = "NORM"
 
-
+prefix_list = list.files(pattern = pattern)
 
 atab<-vector("list",length(prefix_list))
 seltab<-vector("list",length(prefix_list))
@@ -71,7 +68,6 @@ for(pref in prefix_list){
   
   dflist[[counter]] = data.frame(ID=counter,lambda1=A$lambda1.mean,lambda0=A$lambda0.mean,gs=A$gs.mean,pmu=A$pmu.mean,centers=A$centers)[seltab[[counter]],]
   dflist[[counter]]$side=side[[counter]]
-  dflist[[counter]]$total_cell_number <- nrow(read.table(file = paste(folder,"/centers.dat",sep="")))
   dflist[[counter]]$LI <- unlist(read.table(file = paste(folder,"/LI.dat",sep="")))
   dflist[[counter]]$wcc <- unlist(read.table(file = paste(folder,"/wcc.dat",sep="")))
   dflist[[counter]]$Assembly_freq <- unlist(read.table(file = paste(folder,"/Assembly_Freq.dat",sep="")))
@@ -83,6 +79,8 @@ for(pref in prefix_list){
   
   dflist[[counter]] <- cbind(dflist [[counter]], read.table(paste(folder, '/begin_firing.dat', sep = "")))
   #dflist[[counter]] <- cbind(dflist [[counter]], read.table(paste(folder, '/assembly_duration_and_co.dat', sep = "")))
+  #df$list [[counter]] <- read.table(file = paste(folder, "/assembly_centers.dat", sep ="")))
+  
   
   sample_size[counter,] = as.numeric(read.table(paste(folder,"/dims.dat",sep="")))[1:2]
   orig_labels[[counter]]=as.numeric(gsub("V","",names(A$gs.mean)[seltab[[counter]]]))
@@ -159,7 +157,7 @@ make.boxplots <- function(){
 
 plot_n_gs<- function(){
   par(cex=1.2,cex.lab=1.5)
-  barplot(table(df$ID), ylab="number of ensembles",ylim=c(0,60))
+  barplot(table(df$ID), ylab="number of ensembles",ylim=c(0,55))
 }
 
 plot_AP_corr_all<- function(print=FALSE){
@@ -217,7 +215,7 @@ plot_corrdist <- function(print=FALSE){
   if(print) dev.off()
 }
 
-df$norm_eigen <- df$norm_eigen_decomp/df$tectum_total_area
+
 
 
 dat <- apply(df,2, function(x) by(x,df$ID,mean, na.rm =TRUE))
@@ -226,7 +224,7 @@ dat <- apply(df,2, function(x) by(x,df$ID,mean, na.rm =TRUE))
 
 colnames(explained_cells) <- c("ensembled_neurons", "free_neurons")
 numb_ensembles <- data.frame(table(df$ID)) [,2]
-dat <- as.data.frame(cbind(dat,explained_cells, numb_ensembles)) 
+dat <- as.data.frame(cbind(dat, numb_ensembles)) 
 
 dat$Genotype <-  rep(paste(genotype),1, length(prefix_list))
 dat$age <- rep(paste(age), 1, length(prefix_list))
@@ -238,11 +236,12 @@ dat$Rearing_conditions <- rep(paste(Rearing_conditions), 1, length(prefix_list))
 
 write.table(dat, paste("mean_across_fish/", genotype,"_", age,"_", Rearing_conditions, "_mean_datatable.dat", sep =""))
 
+
+
 df$Genotype <-  rep(paste(genotype),1, nrow(df))
 df$age <- rep(paste(age), 1, nrow(df))
 df$Rearing_conditions <- rep(paste(Rearing_conditions), 1, nrow(df))
 write.table(df, paste("mean_across_fish/", genotype,"_", age,"_", Rearing_conditions, "_all_assemblies_datatable.dat", sep =""))
-
 
 
 
@@ -271,22 +270,3 @@ calculate_difference_mat <- function(x = "gs",  y = "lambda1", cond_a, cond_b) {
 
 
 
-
-threshold_tests <- function(new, threshold){
-  new <- new [threshold,]
-  a <- aggregate(x = new, by = list(new$ID, new$Rearing_conditions), FUN = mean)
-  print(paste("total assembly number:", str(nrow(new))))
- 
-  ggplot(a, aes(group.2, gs)) + geom_boxplot() + geom_jitter()
-  #return(t.test(a$gs ~ a$Group.2))
- 
-}
-
-plot_explained<-function(){
-  ensembled_neurons <- aggregate(df$gs, by=list(df$ID), 
-                                FUN=sum, na.rm=TRUE)$x
-  free_neurons <- aggregate(df$total_cell_number, by = list(df$ID), FUN = max)$x - ensembled_neurons
-  explained_cells <- data.frame(ensembled_neurons = ensembled_neurons, free_neurons = free_neurons)
-  p=barplot(t(explained_cells),ylim=c(0,2500))
-  text(p,explained_cells[,1],label=paste(round(explained_cells[,1]/(explained_cells$ensembled_neurons+explained_cells$free_neurons)*100,digits=1),"%"),pos=3)
-}

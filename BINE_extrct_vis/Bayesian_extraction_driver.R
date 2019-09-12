@@ -10,15 +10,16 @@ LI_filter = FALSE
 
 #########################################################################################################################################################
 
-setwd("/media/thomas_sainsbury/Samsung_T5/Bayesian_network_inference/BPTS_Tom")
+setwd("~/../../media/thomas_sainsbury/Samsung_T5/SeG/results/Baysian_network_inference/BPTS_Tom/")
 
 data_location = "../data_for_Gibbs/7_dpf/"
 centers_suffix = "_sa_aligned_all_cells_centers_cut_ordered.dat"
 spikes_suffix = "_sa_aligned_all_cells_spikes.dat"
 midline <- data.frame(cbind(intercept = c(295, 312, 267, 345, 386, 327, 243, 362), slope = c(-1.23, -1.23, -1, -1.57, -1.828, -1.38, -1.012, -1.62)))
-#midline <- data.frame(cbind(intercept = c(10, 10, 10, 10, 10, 10, 10, 10), slope = c(-0.97, -0.97, -0.97, -0.97, -0.97, -0.97, -0.97, -0.97)))
-pattern <- "*WT_h2b_gc6s_7dpf_*"
+#midline <- data.frame(cbind(intercept = c(-6, -6, -6, -6, -6, -6, -6, -6), slope = c(-1, -1, -1, -1, -1, -1, -1, -1)))
+apattern <- "*WT_h2b_gc6s_7dpf_*"
 reg = FALSE
+if (reg == TRUE) {midline <- data.frame(cbind(intercept = c(-6, -6, -6, -6, -6, -6, -6, -6), slope = c(-1, -1, -1, -1, -1, -1, -1, -1)))}
 
 genotype = "WT"
 age = "7_dpf"
@@ -30,7 +31,8 @@ corr_data = paste(genotype,"_", age,"_", Rearing_conditions, sep = "")
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
 #Check_midlines(midline = midline, folder = data_location)
-source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+#source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+source("../Bayes_R/BINE_extrct_vis/membership.R")
 
 
 # 5_dpf 
@@ -58,7 +60,8 @@ corr_data = paste(genotype,"_", age,"_", Rearing_conditions, sep = "")
 #snp(folder = data_location, save_name = corr_data)
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
-source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+source("../Bayes_R/BINE_extrct_vis/membership.R")
+#source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 
 
 
@@ -90,8 +93,8 @@ Check_midlines(midline = midline, folder = data_location)
 
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
-source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
-
+#source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+source("../Bayes_R/BINE_extrct_vis/membership.R")
 
 
 
@@ -124,7 +127,8 @@ corr_data = paste(genotype,"_", age,"_", Rearing_conditions, sep = "")
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
 
-source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+#source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+source("../Bayes_R/BINE_extrct_vis/membership.R")
 
 
 #WT_5_dpf
@@ -148,7 +152,11 @@ Check_midlines(midline = midline, folder = data_location)
 
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
-source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+#source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+source("../Bayes_R/BINE_extrct_vis/membership.R")
+
+
+
 
 #WT_3_dpf
 ########################################################################################################################################################
@@ -172,8 +180,8 @@ Check_midlines(midline = midline, folder = data_location)
 
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
-source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
-
+#source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+source("../Bayes_R/BINE_extrct_vis/membership.R")
 
 
 
@@ -212,7 +220,10 @@ Check_midlines(midline = midline, folder = data_location)
 
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
-source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+#source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+source("../Bayes_R/BINE_extrct_vis/membership.R")
+
+
 
 
 #Grin 7_dpf_NORM
@@ -239,5 +250,5 @@ Check_midlines(midline = midline, folder = data_location)
 
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
-source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
-
+#source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
+source("../Bayes_R/BINE_extrct_vis/membership.R")

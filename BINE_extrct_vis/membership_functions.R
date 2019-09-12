@@ -8,10 +8,33 @@ library(fields)
 
 # functions to calculate the size of the tectum
 
+guassian_smooth <- function(x, width){
+  if (sum(x) == 0) {
+    sm_tr <- rep(0, length(x))
+  }
+  else{
+    sm_tr = density(which(x == 1), width = width,  from = 0, to = length(x), n = length(x))$y
+  }
+  return(sm_tr)
+}
+
 cha<-function(x,y){
   chull(x,y)->i
   return(areapl(cbind(x[i],y[i])))
 }
+
+
+beg_fire_ten <- function(omega, bin_size=50){
+  beg_rate <- rowSums(omega [,1:bin_size])
+  av_rate <- vector(length = nrow(omega))
+  for (i in 1:nrow(omega)) {
+    trace = omega [i,] [10061:ncol(omega)]
+    reshaped_end = matrix(trace, ncol = bin_size)
+    av_rate [i] <- max(rowSums(reshaped_end))
+  }
+  return((beg_rate-av_rate)/50)
+}
+
 
 total_area <- function(minprob = 0.99){
   areas = vector("numeric", length = length(as.numeric(names(tab)[sel])))
@@ -42,6 +65,15 @@ plot_midline <- function() {
   abline(a = midline [prefix_ID,1], b= midline [prefix_ID,2], col = "red", lwd = 2 )
 }
 
+plot_all_centers <- function(folder){
+  files <- list.files(path = folder, pattern = "registered")
+  plot(read.table(paste(folder, files [[1]], sep  = "")) [,1:2])
+  for (i in 1:length(files)) {
+    points(read.table(paste(folder, files [[i]], sep  = "")) [,1:2])
+  }
+  
+}
+
 Lateral_index <- function(){
   LI <- vector("numeric", length = length(ensel))
   counter = 1
@@ -51,11 +83,57 @@ Lateral_index <- function(){
     RH <- sum(assembly_mem [,2] < (midline$slope [prefix_ID]*assembly_mem [,1] +midline$intercept [prefix_ID]))
     ALL <- nrow(assembly_mem)
     LI [counter] <- ((LH-RH)/ALL)
-    counter = counter +1
-    
+    counter = counter + 1
   }
   return(LI)
 }
+
+
+LI <- function(mid = midline [1,]) {
+  # X the omega_traj_object
+  LI <- vector("numeric", length = length(ensel))
+  counter = 1
+  for (i in as.numeric(ensel)){
+    assembly_mem <- centers [mem==i & probs>.99, 1:2]
+    if (is.null(dim(assembly_mem))) {
+      LI [i] <- NA
+    }
+    else {
+      LH = sum(assembly_mem [,2] > (mid$slope *assembly_mem [,1] +mid$intercept))
+      RH <- sum(assembly_mem [,2] < (mid$slope*assembly_mem [,1] +mid$intercept))
+      ALL <- nrow(assembly_mem)
+      LI [counter] <- ((LH-RH)/ALL)
+      counter = counter +1
+    }
+  }
+  return(LI)
+}
+
+
+NULL_LI <- function(mid = midline [1,], samples = 2000) {
+  # X the omega_traj_object
+  all_samples_LI <-list(length = samples)
+  for (j in 1:samples){
+    LI <- vector("numeric", length = length(ensel))
+    counter = 1
+    for (i in as.numeric(ensel)){
+      assembly_mem <- centers [sample(mem==i & probs>.99),]
+      if (is.null(dim(assembly_mem))) {
+        LI [i] <- NA
+      }
+      else {
+        LH = sum(assembly_mem [,2] > (mid$slope *assembly_mem [,1] +mid$intercept))
+        RH <- sum(assembly_mem [,2] < (mid$slope*assembly_mem [,1] +mid$intercept))
+        ALL <- nrow(assembly_mem)
+        LI [counter] <- ((LH-RH)/ALL)
+        counter = counter +1
+      }
+      }
+      all_samples_LI [[j]] <- LI
+    }
+  return(as.matrix(do.call(cbind, all_samples_LI)))
+}
+
 
 rotate_tect_by_line <- function(centers = centers) {
   angle <- atan(midline$slope [prefix_ID]) +pi
@@ -114,30 +192,67 @@ raster_plot <- function(stmp1, m = "WT_NORM") {
 }
 
 eigen_decomp_of_cov <- function() {
-  whole_tectal_area <- cha(centers [,1], centers [,2])
+  whole_tectal_area <- ((eigen(cov(centers [,1:2]))$values [1]*eigen(cov(centers [,1:2]))$values [2])*pi)
   counter = 1
-  norm_eigen_decomp <- vector("numeric", length = length(as.numeric(names(tab)[sel])))
+  norm_eigen_decomp <- vector("numeric", length = length(ensel))
   for (i in as.numeric(ensel)) {
-    assembly_mem <- centers[mem==i & probs>.99, 1:2]
-    norm_eigen_decomp [counter] <- (eigen(cov(assembly_mem))$values [1]*eigen(cov(assembly_mem))$values [2])
+    assembly_mem <- centers [mem==i & probs>.99,1:2]
+    norm_eigen_decomp [counter] <- (eigen(cov(assembly_mem))$values [1])*(eigen(cov(assembly_mem))$values [2])*(pi)
     counter = counter +1
   }
-  return(cbind(rep(whole_tectal_area, length(as.numeric(ensel))), norm_eigen_decomp))
+  return(norm_eigen_decomp)
 }
+
+NULL_eigen_decomp_of_cov <- function(samples = 2000) {
+  NULLS <- list(length = samples)
+  for (j in 1:samples) {
+    whole_tectal_area <- ((eigen(cov(centers [,1:2]))$values [1]*eigen(cov(centers [,1:2]))$values [2])*pi)
+    counter = 1
+    norm_eigen_decomp <- vector("numeric", length = length(ensel))
+    for (i in as.numeric(ensel)) {
+      a <- sum(mem==i & probs>.99)
+      assembly_mem <- centers [sample(seq(1,nrow(centers)), a),1:2]
+      norm_eigen_decomp [counter] <- (eigen(cov(assembly_mem))$values [1])*(eigen(cov(assembly_mem))$values [2])*(pi)
+      counter = counter +1
+      }
+    NULLS [[j]] <- norm_eigen_decomp
+  }
+  return(as.matrix(do.call(cbind, NULLS)))
+} 
 
 within_cluster_corr <- function(){
   ensemble_mean <- vector("numeric", length = length(ensel))
   counter = 1
-  spikes <- s [selection +1,]
+  spikes <- t(apply(s [selection +1,], 1, guassian_smooth, 3))
   for (i in as.numeric(ensel)){
-    assembly_mem <- centers[mem==i & probs>.99, 1:2]
-    cor_mat <- cor(t(spikes[mem == i,]))
+    
+    cor_mat <- cor(t(spikes[mem==i & probs>.99,]))
     lower <- cor_mat[lower.tri(cor_mat)]
     ensemble_mean [counter] <- mean(lower)
     counter = counter+1
   }
   return(ensemble_mean)
 }
+
+NULL_within_cluster_corr <- function(samples) {
+  NULLS <- list(length = samples)
+  spikes <- t(apply(s [selection +1,], 1, guassian_smooth, 3))
+  for (j in 1:samples){
+    ensemble_mean <- vector("numeric", length = length(ensel))
+    counter = 1
+    for (i in as.numeric(ensel)){
+      a <- sum(mem==i & probs>.99)
+      cor_mat <- cor(t(spikes[sample(seq(1,nrow(centers)), a),]))
+      lower <- cor_mat[lower.tri(cor_mat)]
+      ensemble_mean [counter] <- mean(lower)
+      counter = counter+1
+    }
+  NULLS [[j]] <- ensemble_mean
+  }
+  return(as.matrix(do.call(cbind, NULLS)))
+}
+
+
 
 sort_by_correlation <-function(omega) {
   d <- dist(omega)
@@ -676,4 +791,48 @@ check_exclusions <- function(folder_names) {
   par(mar = c(6,6,0,2))
   
   image(t(omega_ex))
+}
+
+plot_assembly_w_omega <- function(ensel_num, xlim = c(1,17460)){
+  cells <- s[selection+1, ] [mem == ensel [ensel_num] &  probs > 0.99,]
+  cor_with_cluster <- cor(omega_extended [which(ensel == ensel [ensel_num]),] > 0.8, t(cells))
+  cells <- cells [order(cor_with_cluster,decreasing = TRUE), ]
+  layout(matrix(c(1,1,1,1,1,1,2,2), nrow = 4, ncol = 2, byrow = TRUE))
+  par( mar = c(0,6,6,2))
+  raster_plot2(cells, xlim = xlim)
+  par( mar = c(2,6,0,2))
+  plot(omega_extended [which(ensel == ensel [ensel_num]),], type ='h', xlim = xlim, xaxs = "i", yaxs ="i",  cex.axis =2, ylab = "prob Aseembly Active")
+}
+
+
+
+raster_plot2 <- function(stmp1, m = "WT_GRAV",axes =F, xlim = c(0,17460)) {
+  # stmp1 is the binary activity matrix
+  circular_permutation <- function(t) {
+    permute_by <- round(runif(1,1, length(t)))
+    pt <- c(tail(t, -permute_by), head(t, permute_by))
+    return(pt)
+  }
+  stmp1<- as.matrix(stmp1)
+  stmp1_vec = as.numeric(unlist(stmp1))
+  u1=rep(1:ncol(stmp1),1,each=nrow(stmp1))
+  v1=rep(1:nrow(stmp1),ncol(stmp1))
+  plot(u1[stmp1_vec>0],v1[stmp1_vec>0],pch=19,cex=0.001,col="black",cex.main=3, xlim = xlim, xaxt='n',  xaxs = "i", yaxs ="i", ylim = c(0,nrow(stmp1)), ylab =  "Cell ID", cex.axis = 2, cex.lab = 3)
+  title(main = list( m, cex = 2.5), adj = 0.5, line = 2)
+}
+
+
+Assembly_centers <- function(centers) {
+  x_coords <- vector("numeric", length(ensel))
+  y_coords <- vector("numeric", length(ensel))
+  z_coords <- vector("numeric", length(ensel))
+  counter = 1
+  for (i in as.numeric(ensel)) {
+    assembly_mem <- centers[mem==i & probs>.99, ]
+    x_coords [counter] <- mean(assembly_mem [,1])
+    y_coords [counter] <- mean(assembly_mem [,2])
+    z_coords [counter] <- mean(assembly_mem [,3])
+    counter = counter +1
+   }
+  return(data.frame(x_coords, y_coords, z_coords))
 }
