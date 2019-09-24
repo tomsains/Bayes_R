@@ -260,10 +260,16 @@ sort_by_correlation <-function(omega) {
   ensel_sort <- ensel [hclust(d)$order]
   cell_list <- list(length(ensel_sort))
   for (i in 1:length(ensel_sort)) {
+    
     cells <- s[selection+1, ] [mem == ensel_sort [i] &  probs > 0.99,]
+    if (nrow(cells) < 2) {
+      cell_list [[i]] <- cells
+    }
+    else {
     dis <- dist(cells)
     cells <- cells [hclust(dis)$order, ]
     cell_list [[i]] <- cells
+    }
   }
   raster_plot(do.call("rbind", cell_list))
 }

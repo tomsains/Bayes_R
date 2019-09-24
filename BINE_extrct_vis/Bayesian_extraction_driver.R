@@ -17,7 +17,7 @@ centers_suffix = "_sa_aligned_all_cells_centers_cut_ordered.dat"
 spikes_suffix = "_sa_aligned_all_cells_spikes.dat"
 midline <- data.frame(cbind(intercept = c(295, 312, 267, 345, 386, 327, 243, 362), slope = c(-1.23, -1.23, -1, -1.57, -1.828, -1.38, -1.012, -1.62)))
 #midline <- data.frame(cbind(intercept = c(-6, -6, -6, -6, -6, -6, -6, -6), slope = c(-1, -1, -1, -1, -1, -1, -1, -1)))
-apattern <- "*WT_h2b_gc6s_7dpf_*"
+pattern <- "*WT_h2b_gc6s_7dpf_*"
 reg = FALSE
 if (reg == TRUE) {midline <- data.frame(cbind(intercept = c(-6, -6, -6, -6, -6, -6, -6, -6), slope = c(-1, -1, -1, -1, -1, -1, -1, -1)))}
 
@@ -32,7 +32,8 @@ corr_data = paste(genotype,"_", age,"_", Rearing_conditions, sep = "")
 #source("Generalise_make_figures.R")
 #Check_midlines(midline = midline, folder = data_location)
 #source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
-source("../Bayes_R/BINE_extrct_vis/membership.R")
+#source("../Bayes_R/BINE_extrct_vis/membership.R")
+source("../Bayes_R/BINE_extrct_vis/Combine_conditions_thesis_version.R")
 
 
 # 5_dpf 
@@ -60,9 +61,9 @@ corr_data = paste(genotype,"_", age,"_", Rearing_conditions, sep = "")
 #snp(folder = data_location, save_name = corr_data)
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
-source("../Bayes_R/BINE_extrct_vis/membership.R")
+#source("../Bayes_R/BINE_extrct_vis/membership.R")
 #source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
-
+source("../Bayes_R/BINE_extrct_vis/Combine_conditions_thesis_version.R")
 
 
 
@@ -94,8 +95,8 @@ Check_midlines(midline = midline, folder = data_location)
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
 #source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
-source("../Bayes_R/BINE_extrct_vis/membership.R")
-
+#source("../Bayes_R/BINE_extrct_vis/membership.R")
+source("../Bayes_R/BINE_extrct_vis/Combine_conditions_thesis_version.R")
 
 
 # WT GRAV 
@@ -123,12 +124,12 @@ corr_data = paste(genotype,"_", age,"_", Rearing_conditions, sep = "")
 
 #Check_midlines(midline = midline, folder = data_location)
 #snp(folder = data_location, save_name = corr_data)
-
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
-
 #source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
-source("../Bayes_R/BINE_extrct_vis/membership.R")
+#source("../Bayes_R/BINE_extrct_vis/membership.R")
+source("../Bayes_R/BINE_extrct_vis/Combine_conditions_thesis_version.R")
+
 
 
 #WT_5_dpf
@@ -137,7 +138,7 @@ data_location = "../data_for_Gibbs/Grav_5_dpf/"
 centers_suffix = "_scaled_aligned_all_cells_centers_cut_ordered.dat"
 spikes_suffix = "_scaled_aligned_all_cells_spikes.dat"
 
-midline <- data.frame(cbind(intercept = c(185, 160, 175, 360, 205), slope = c(-0.7, -0.4,-0.5,-1.8, -0.7)))
+midline <- data.frame(cbind(intercept = c(185, 160, 175, 360, 205, 243, 195), slope = c(-0.7, -0.4,-0.5,-1.8, -0.7, -1, -0.7)))
 
 pattern <- "*_grav_5dpf_h2b_GCAMP6_sa_*"
 reg = FALSE
@@ -154,7 +155,7 @@ Check_midlines(midline = midline, folder = data_location)
 #source("Generalise_make_figures.R")
 #source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 source("../Bayes_R/BINE_extrct_vis/membership.R")
-
+source("../Bayes_R/BINE_extrct_vis/Combine_conditions_thesis_version.R")
 
 
 
@@ -165,7 +166,7 @@ centers_suffix = "_scaled_aligned_all_cells_centers_cut_ordered.dat"
 spikes_suffix = "_scaled_aligned_all_cells_spikes.dat"
 
 
-midline <- data.frame(cbind(intercept = c(230,165), slope = c(-0.8, -0.3)))
+midline <- data.frame(cbind(intercept = c(230,165, 300), slope = c(-0.8, -0.3, -1.07)))
 
 pattern <- "*_grav_3dpf_h2b_GCAMP6_sa_*"
 reg = FALSE
@@ -182,7 +183,7 @@ Check_midlines(midline = midline, folder = data_location)
 #source("Generalise_make_figures.R")
 #source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
 source("../Bayes_R/BINE_extrct_vis/membership.R")
-
+source("../Bayes_R/BINE_extrct_vis/Combine_conditions_thesis_version.R")
 
 
 
@@ -221,8 +222,8 @@ Check_midlines(midline = midline, folder = data_location)
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
 #source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
-source("../Bayes_R/BINE_extrct_vis/membership.R")
-
+#source("../Bayes_R/BINE_extrct_vis/membership.R")
+source("../Bayes_R/BINE_extrct_vis/Combine_conditions_thesis_version.R")
 
 
 
@@ -251,4 +252,5 @@ Check_midlines(midline = midline, folder = data_location)
 #source("Generalised_membership_v4.R")
 #source("Generalise_make_figures.R")
 #source("../Bayes_R/BINE_extrct_vis/ensemble_features_bySample.R")
-source("../Bayes_R/BINE_extrct_vis/membership.R")
+#source("../Bayes_R/BINE_extrct_vis/membership.R")
+source("../Bayes_R/BINE_extrct_vis/Combine_conditions_thesis_version.R")

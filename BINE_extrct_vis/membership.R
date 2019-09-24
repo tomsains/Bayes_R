@@ -73,7 +73,9 @@ for (i in 1:length(prefix_list)){
                   A$pmu.mean>pmu_thresh &
                   A$lambda0.mean<lambda0_thresh &
                   !as.numeric(gsub("V","",names(A$gs.mean)))%in% exc)
+  sel [is.na(sel)] = FALSE  
   # ensemble selection
+  
   ensel=enIDs[sel]
   print(i)
   # calculate side_AP_ordered

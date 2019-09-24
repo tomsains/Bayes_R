@@ -205,11 +205,11 @@ plot_dpf_7()
 dev.off()
 
 png("../../Lab_meeting_plots/IOP_talk/GG_Coherence_dev.png", width = 800, height = 600)
-plot_dpf_7(y = lambda1, ylab = "Coherence", ylim = c(0.1,0.24))
+plot_dpf_7(y = "lambda1", ylab = "Coherence", ylim = c(0.1,0.3))
 dev.off()
 
 png("../../Lab_meeting_plots/IOP_talk/GG_noise_dev.png", width = 800, height = 600)
-plot_dpf_7(y = "lambda0", ylab = "noise",ylim = c(0.005,0.01))
+plot_dpf_7(y = "lambda0", ylab = "noise",ylim = c(0.004,0.012))
 dev.off()
 
 
@@ -249,7 +249,7 @@ dev.off()
 
 
 png("../../Lab_meeting_plots/IOP_talk/GG_Assembly_area_dev.png", width = 800, height = 600)
-plot_dpf_7(y= "norm_eigen_decomp", ylab = "Assembly Area\n Normalised to tectal area", ylim = c(0,200))
+plot_dpf_7(y= "norm_eigen_decomp", ylab = "Assembly Area\n Normalised to tectal area", ylim = c(0,20000000))
 dev.off()
 
 png("../../Lab_meeting_plots/IOP_talk/GG_SN_Freq_dev.png", width = 800, height = 600)

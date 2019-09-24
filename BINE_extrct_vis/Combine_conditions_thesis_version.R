@@ -216,10 +216,11 @@ plot_corrdist <- function(print=FALSE){
 }
 
 
+df <- df [complete.cases(df),]
+df <- df [!df$Beg_thresh,]
 
 
 dat <- apply(df,2, function(x) by(x,df$ID,mean, na.rm =TRUE))
-
 
 
 colnames(explained_cells) <- c("ensembled_neurons", "free_neurons")
@@ -234,13 +235,14 @@ dat$Rearing_conditions <- rep(paste(Rearing_conditions), 1, length(prefix_list))
 #dat$cell_num <- unlist(as.vector(read.table(paste("mean_across_fish/cell_num_", genotype,"_", age,"_", Rearing_conditions, ".dat", sep = ""))))
 
 
-write.table(dat, paste("mean_across_fish/", genotype,"_", age,"_", Rearing_conditions, "_mean_datatable.dat", sep =""))
+write.table(dat , paste("mean_across_fish/", genotype,"_", age,"_", Rearing_conditions, "_mean_datatable.dat", sep =""))
 
 
 
 df$Genotype <-  rep(paste(genotype),1, nrow(df))
 df$age <- rep(paste(age), 1, nrow(df))
 df$Rearing_conditions <- rep(paste(Rearing_conditions), 1, nrow(df))
+
 write.table(df, paste("mean_across_fish/", genotype,"_", age,"_", Rearing_conditions, "_all_assemblies_datatable.dat", sep =""))
 
 
